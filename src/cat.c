@@ -140,7 +140,7 @@ static bool is_variables_access_possible(struct cat_object *self, const struct c
 
         ok = false;
         for (i = 0; i < cmd->var_num; i++) {
-                var = &cmd->var[i];
+                var = cmd->var[i];
                 if ((var->access == CAT_VAR_ACCESS_READ_WRITE) || (var->access == access)) {
                         ok = true;
                         break;
@@ -890,12 +890,12 @@ static void start_processing_format_test_args(struct cat_object *self, cat_fsm_t
                 case CAT_FSM_TYPE_ATCMD:
                         self->state = CAT_STATE_FORMAT_TEST_ARGS;
                         self->index = 0;
-                        self->var = cmd->var;
+                        self->var = cmd->var[0];
                         break;
                 case CAT_FSM_TYPE_UNSOLICITED:
                         self->unsolicited_fsm.state = CAT_UNSOLICITED_STATE_FORMAT_TEST_ARGS;
                         self->unsolicited_fsm.index = 0;
-                        self->unsolicited_fsm.var = cmd->var;
+                        self->unsolicited_fsm.var = cmd->var[0];
                         break;
                 default:
                         assert(false);
@@ -986,12 +986,12 @@ static void start_processing_format_read_args(struct cat_object *self, cat_fsm_t
                 case CAT_FSM_TYPE_ATCMD:
                         self->state = CAT_STATE_FORMAT_READ_ARGS;
                         self->index = 0;
-                        self->var = cmd->var;
+                        self->var = cmd->var[0];
                         break;
                 case CAT_FSM_TYPE_UNSOLICITED:
                         self->unsolicited_fsm.state = CAT_UNSOLICITED_STATE_FORMAT_READ_ARGS;
                         self->unsolicited_fsm.index = 0;
-                        self->unsolicited_fsm.var = cmd->var;
+                        self->unsolicited_fsm.var = cmd->var[0];
                         break;
                 default:
                         assert(false);
@@ -1427,7 +1427,7 @@ static cat_status parse_write_args(struct cat_object *self)
         }
 
         if ((++self->index < self->cmd->var_num) && (stat > 0)) {
-                self->var = &self->cmd->var[self->index];
+                self->var = self->cmd->var[self->index];
                 return CAT_STATUS_BUSY;
         }
 
@@ -1758,7 +1758,7 @@ static cat_status next_format_var_by_fsm(struct cat_object *self, cat_fsm_type f
                                 return CAT_STATUS_BUSY;
                         }
                         get_atcmd_buf(self)[self->position++] = ',';
-                        self->var = &cmd->var[self->index];
+                        self->var = cmd->var[self->index];
                         return CAT_STATUS_BUSY;
                 }
                 break;
@@ -1769,7 +1769,7 @@ static cat_status next_format_var_by_fsm(struct cat_object *self, cat_fsm_type f
                                 return CAT_STATUS_BUSY;
                         }
                         get_unsolicited_buf(self)[self->unsolicited_fsm.position++] = ',';
-                        self->unsolicited_fsm.var = &cmd->var[self->unsolicited_fsm.index];
+                        self->unsolicited_fsm.var = cmd->var[self->unsolicited_fsm.index];
                         return CAT_STATUS_BUSY;
                 }
                 break;
@@ -1892,7 +1892,7 @@ static cat_status parse_command_args(struct cat_object *self)
                         self->state = CAT_STATE_PARSE_WRITE_ARGS;
                         self->position = 0;
                         self->index = 0;
-                        self->var = &self->cmd->var[self->index];
+                        self->var = self->cmd->var[self->index];
                         break;
                 }
                 if (self->cmd->write == NULL) {
@@ -2434,7 +2434,7 @@ struct cat_variable const* cat_search_variable_by_name(struct cat_object *self, 
         assert(name != NULL);
 
         for (i = 0; i < cmd->var_num; i++) {
-                var = &cmd->var[i];
+                var = cmd->var[i];
                 if ((var->name != NULL) && (strcmp(var->name, name) == 0))
                         return var;
         }

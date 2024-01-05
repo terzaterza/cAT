@@ -246,7 +246,7 @@ struct cat_command {
         cat_cmd_run_handler run; /* run command handler */
         cat_cmd_test_handler test; /* test command handler */
 
-        struct cat_variable const *var; /* pointer to array of variables assiocated with this command */
+        struct cat_variable const **var; /* pointer to array of variables assiocated with this command */
         size_t var_num; /* number of variables in array */
 
         bool need_all_vars; /* flag to need all vars parsing */
